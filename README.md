@@ -5,6 +5,6 @@ Juego de muestra tipo Among us combinado con pacman. El objetivo de este juego e
 # Encargados
 
 - Tamara Badilla Vázquez 
-- Jourge Ulloa
+- Jourge Ulloa Castillo 
 
 Los ayudantes del ramo
