@@ -74,6 +74,19 @@ def agrega_monedas(mat, n):
 
     return mat
 
+def posicion_amigos(mat):
+
+    x = random.randrange(0,len(mat))
+    y = random.randrange(0,len(mat[0]))
+
+    while (mat[x][y] < 1):
+        x = random.randrange(0,len(mat))
+        y = random.randrange(0,len(mat[0]))
+
+    print([x,y], mat[x][y])
+    return [x,y]
+
+
 #================================================================
 #                       Funcion principal
 #================================================================
@@ -113,14 +126,17 @@ def main():
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0]
     ]
 
-    # we use the sizes to draw as well as to do our "steps" in the loops. 
     ancho_cuadrado = 50  
     alto_cuadrado = 50
     cantidad_obstaculos = 10
     cantidad_monedas = 30
+    n_cpus = 3
+    posicion_cpu = []
 
     matrix = agrega_obstaculos(matrix, cantidad_obstaculos)
     matrix = agrega_monedas(matrix, cantidad_monedas)
+    for i in range(n_cpus):
+        posicion_cpu.append(posicion_amigos(matrix))
     #-------------------------------------------------
 
     pygame.display.flip()
@@ -128,8 +144,17 @@ def main():
     reloj = pygame.time.Clock()
     despliega_matriz(alto_cuadrado, ancho_cuadrado, matrix)
     corriendo = True
+    print()
     while corriendo:
     
+        #Coloca cpus en el mapa en negro
+        #NO FUNCIONA POR ALGUNA RAZON?
+        for i in range(n_cpus):
+            
+            x = posicion_cpu[i][0] * ancho_cuadrado
+            y = posicion_cpu[i][1] * alto_cuadrado
+            crea_cuadrado(x, y, (0, 0, 0), alto_cuadrado, ancho_cuadrado) #negro
+            
         reloj.tick(60) #Fuerza a correr a 60 FPS 
 
         for event in pygame.event.get():
