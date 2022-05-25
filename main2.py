@@ -2,17 +2,18 @@ import pygame
 import sys
 import os
 import random
+from pygame.locals import *
 
 
 #================================================================
 #                       Despliega matriz
 #================================================================
 
-def crea_cuadrado(x, y, color, alto_cuadrado, ancho_cuadrado):
+def crea_cuadrado(x: int, y: int, color: tuple, alto_cuadrado: int, ancho_cuadrado:int):
 
     pygame.draw.rect(ventana, color, [x, y, ancho_cuadrado, alto_cuadrado ])
 
-def despliega_matriz(alto_cuadrado, ancho_cuadrado, matrix):
+def despliega_matriz(alto_cuadrado: int, ancho_cuadrado: int, matrix: list):
 
     y = 0  # we start at the top of the screen
     for row in matrix:
@@ -44,51 +45,51 @@ def despliega_matriz(alto_cuadrado, ancho_cuadrado, matrix):
 #                       Generacion random
 #================================================================
 
-def agrega_obstaculos(mat, n):
+def agrega_obstaculos(mat: list, n: int):
 
     for i in range(n):
 
         x = random.randrange(0,len(mat))
         y = random.randrange(0,len(mat[0]))
 
-        while (mat[x][y] != 1):
+        while (mat[y][x] != 1):
             x = random.randrange(0,len(mat))
             y = random.randrange(0,len(mat[0]))
 
-        mat[x][y] = -1
+        mat[y][x] = -1
 
     return mat
 
-def agrega_monedas(mat, n):
+def agrega_monedas(mat: list, n: int):
 
     for i in range(n):
 
         x = random.randrange(0,len(mat))
         y = random.randrange(0,len(mat[0]))
 
-        while (mat[x][y] < 1):
+        while (mat[y][x] < 1):
             x = random.randrange(0,len(mat))
             y = random.randrange(0,len(mat[0]))
 
-        mat[x][y] = -2
+        mat[y][x] = -2
 
     return mat
 
-def posicion_amigos(mat):
+def posicion_amigos(mat: list, pos: list):
 
     x = random.randrange(0,len(mat))
     y = random.randrange(0,len(mat[0]))
 
-    while (mat[x][y] < 1):
+    while (mat[y][x] < 1 or [y,x] in pos):
         x = random.randrange(0,len(mat))
         y = random.randrange(0,len(mat[0]))
 
-    print([x,y], mat[x][y])
+    print([x,y], mat[y][x])
     return [x,y]
 
 
 #================================================================
-#                       Funcion principal
+#                       Funciones pantallas
 #================================================================
 
 ANCHO_VENTANA = 1000
@@ -100,7 +101,7 @@ ventana = pygame.display.set_mode((ANCHO_VENTANA, ALTO_VENTANA))
 pygame.display.set_caption("Tutorial")
 ventana.fill((195, 247, 126)) #color de fondo
 
-def main():
+def main_nivel():
     
     #-------------------------------------------------
     matrix = [
@@ -130,32 +131,44 @@ def main():
     alto_cuadrado = 50
     cantidad_obstaculos = 10
     cantidad_monedas = 30
-    n_cpus = 3
-    posicion_cpu = []
+    n_personajes = 4 #minimo 1 para que haya un player
+    posiciones = []
+    rol_infiltrado = []
 
-    matrix = agrega_obstaculos(matrix, cantidad_obstaculos)
-    matrix = agrega_monedas(matrix, cantidad_monedas)
-    for i in range(n_cpus):
-        posicion_cpu.append(posicion_amigos(matrix))
+    matrix_nueva = agrega_obstaculos(matrix, cantidad_obstaculos)
+    matrix_nueva = agrega_monedas(matrix_nueva, cantidad_monedas)
+
+    for i in range(n_personajes):
+        posiciones.append(posicion_amigos(matrix_nueva, posiciones))
+        rol_infiltrado.append(0)
+
+    #Puede que no sea necesario guardarlo en una lista, pero por ahora lo voy a dejar asi por si sirve
+    indice_infiltrado = random.randrange(0, n_personajes)
+    rol_infiltrado[indice_infiltrado] = 1 
+
     #-------------------------------------------------
 
     pygame.display.flip()
     
     reloj = pygame.time.Clock()
-    despliega_matriz(alto_cuadrado, ancho_cuadrado, matrix)
+    despliega_matriz(alto_cuadrado, ancho_cuadrado, matrix_nueva)
     corriendo = True
     print()
     while corriendo:
     
         #Coloca cpus en el mapa en negro
-        #NO FUNCIONA POR ALGUNA RAZON?
-        for i in range(n_cpus):
+        for i in range(n_personajes):
+            x=0
+            x = posiciones[i][0] * ancho_cuadrado
+            y = posiciones[i][1] * alto_cuadrado
+
+            if (i == indice_infiltrado):
+                crea_cuadrado(x, y, (200, 0, 0), alto_cuadrado, ancho_cuadrado) #rojo
+
+            else:
+                crea_cuadrado(x, y, (0, 0, 0), alto_cuadrado, ancho_cuadrado) #negro
             
-            x = posicion_cpu[i][0] * ancho_cuadrado
-            y = posicion_cpu[i][1] * alto_cuadrado
-            crea_cuadrado(x, y, (0, 0, 0), alto_cuadrado, ancho_cuadrado) #negro
-            
-        reloj.tick(60) #Fuerza a correr a 60 FPS 
+        reloj.tick(5) #Fuerza a correr a 60 FPS 
 
         for event in pygame.event.get():
             
@@ -166,13 +179,16 @@ def main():
                 
     sys.exit()
 
-def menu_inicio():
+#--------------------------------------------------------------------------------------------------------------------
+def pantallaInstrucciones():
 
-    
-    ventana.fill((195, 200, 150)) #color de fondo
-    
-    fuente = pygame.font.SysFont('unispacebold', 64)
-    
+    ventana.fill((100, 150, 80)) #color de fondo
+
+    fuente = pygame.font.SysFont('unispacebold', 32)
+
+    vidasTxt = fuente.render("Aqui van las instrucciones, presione espacio para volver al menu", True, (255,255,255))
+    ventana.blit(vidasTxt,(100,100))
+
     pygame.display.flip()
     
     corriendo = True
@@ -186,17 +202,46 @@ def menu_inicio():
                 elif (event.type == pygame.KEYDOWN):
                     
                     if event.key == K_SPACE: #mueve hacia arriba
-                        reiniciar = True
-                        while reiniciar:
-                            reiniciar, ganador, puntos = nivelPrincipal(pantalla, margen, dimensionMatrix, ancho, alto, clock, fondo, bloquePintado, bloqueDespintado, bloqueObstaculo, qbert, enemigo1, enemigo2, frames, animacionMuerte, fuente)
-                        final(ganador, pantallaGanador, pantallaPerdedor, puntos, fuente)  
+                        main_menu()  
                             
                             
                     elif event.key == K_ESCAPE: #mueve hacia arriba
+                        corriendo = False    
+
+    sys.exit()
+
+#--------------------------------------------------------------------------------------------------------------------
+def main_menu():
+
+    ventana.fill((195, 150, 200)) #color de fondo
+    
+    fuente = pygame.font.SysFont('unispacebold', 32)
+
+    vidasTxt = fuente.render("menu principal, presione espacio para empezar, i para instrucciones", True, (255,255,255))
+    ventana.blit(vidasTxt,(100,100))
+
+    pygame.display.flip()
+    
+    corriendo = True
+    while corriendo:
+        for event in pygame.event.get():
+            
+                if (event.type == pygame.QUIT):
+                    corriendo = False
+                
+                #Controlar jugador1
+                elif (event.type == pygame.KEYDOWN):
+                    
+                    if event.key == K_SPACE: 
+                        reiniciar = True
+                        while reiniciar:
+                            main_nivel()  
+                            
+                    elif event.key == K_ESCAPE: 
                         corriendo = False    
                         
                     elif event.key == K_i:
                         pantallaInstrucciones()
     sys.exit()
 
-main()
+main_menu()
