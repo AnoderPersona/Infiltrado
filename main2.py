@@ -96,6 +96,42 @@ def posicion_amigos(mat: list, pos: list):
     print([x, y], mat[y][x])
     return [x, y]
 
+def movimiento_cpu(matrix: list, posiciones: list, n: int):
+
+        movio = False
+
+        while (not movio):
+
+            direccion = random.randint(0, 7)
+
+            #arriba
+            if direccion == 0:
+                #print([posiciones[0][0]][posiciones[0][1]-1], matrix[posiciones[0][0]][posiciones[0][1]-1])
+                if posiciones[n][1] - 1 >= 0 and matrix[posiciones[n][1]-1][posiciones[n][0]] not in [0, -1]:
+                    posiciones[n][1] -= 1
+                    movio = True
+
+            elif direccion == 1:
+                #print(matrix[posiciones[n][0]-1][posiciones[n][1]])
+                if posiciones[n][0] - 1 >= 0 and matrix[posiciones[n][1]][posiciones[n][0]-1] not in [0, -1]:
+                    posiciones[n][0] -= 1
+                    movio = True
+
+            elif direccion == 2:
+                #print(matrix[posiciones[n][0]][posiciones[n][1]+1])
+                if posiciones[n][1] + 1 < 20 and matrix[posiciones[n][1]+1][posiciones[n][0]] not in [0, -1]:
+                    posiciones[n][1] += 1
+                    movio = True
+
+            elif direccion == 3:
+
+                if posiciones[n][0] + 1 < 20 and matrix[posiciones[n][1]][posiciones[n][0]+1] not in [0, -1]:
+                    posiciones[n][0] += 1
+                    movio = True
+            #quieto
+            if (direccion >= 4): movio = True
+        
+        return posiciones
 
 # ================================================================
 #                       Funciones pantallas
@@ -111,11 +147,35 @@ pygame.init()
 ventana = pygame.display.set_mode((ANCHO_VENTANA, ALTO_VENTANA))
 pygame.display.set_caption("Tutorial")
 ventana.fill((195, 247, 126))  # color de fondo
-
+pygame.key.set_repeat(500, 50) #Para permitir la repeticion de teclas, primer parametro es cuanto se demora en milisegundos la primera, y el segundo el resto
 
 def main_nivel():
 
     # -------------------------------------------------
+
+    matrix_const = [
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0],
+        [0, 0, 2, 2, 2, 2, 2, 2, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+        [1, 1, 2, 0, 0, 0, 0, 2, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+        [1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 0, 0],
+        [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 2, 2, 0],
+        [0, 2, 2, 2, 2, 2, 2, 2, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 2, 0],
+        [0, 2, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0],
+        [0, 2, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0],
+        [0, 2, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 0, 2, 0, 0, 0, 0, 0, 0],
+        [0, 2, 2, 2, 2, 2, 2, 2, 2, 0, 2, 0, 0, 2, 0, 1, 1, 1, 1, 1],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 1, 1, 1, 1, 1],
+        [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 2, 1],
+        [2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0],
+        [2, 0, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0],
+        [2, 0, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [2, 0, 1, 1, 1, 0, 0, 1, 2, 0, 2, 2, 2, 0, 1, 1, 1, 1, 1, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2, 0, 2, 0, 1, 1, 1, 1, 1, 0],
+        [0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0]
+    ]
+
     matrix = [
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0],
         [0, 0, 2, 2, 2, 2, 2, 2, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0],
@@ -141,9 +201,11 @@ def main_nivel():
 
     cantidad_obstaculos = 10
     cantidad_monedas = 30
+    monedas_obtenidas = 0
     n_personajes = 4  # minimo 1 para que haya un player
     posiciones = []
     rol_infiltrado = []
+    muertos = []
 
     matrix_nueva = agrega_obstaculos(matrix, cantidad_obstaculos)
     matrix_nueva = agrega_monedas(matrix_nueva, cantidad_monedas)
@@ -154,6 +216,7 @@ def main_nivel():
     for i in range(n_personajes):
         posiciones.append(posicion_amigos(matrix_nueva, posiciones))
         rol_infiltrado.append(0)
+        muertos.append(0)
 
     # Puede que no sea necesario guardarlo en una lista, pero por ahora lo voy a dejar asi por si sirve
     indice_infiltrado = random.randrange(0, n_personajes)
@@ -172,24 +235,29 @@ def main_nivel():
 
         # Coloca cpus en el mapa en negro
         for i in range(n_personajes):
-            x = 0
-            x = posiciones[i][0] * ANCHO_CUADRADO
-            y = posiciones[i][1] * ALTO_CUADRADO
+            
+            if (not muertos[i]):
+            
+                x = 0
+                x = posiciones[i][0] * ANCHO_CUADRADO
+                y = posiciones[i][1] * ALTO_CUADRADO
 
-            if (i == indice_infiltrado):
-                crea_cuadrado(x, y, (200, 0, 0), ALTO_CUADRADO,
-                              ANCHO_CUADRADO)  # rojo
+                if (i == indice_infiltrado):
+                    crea_cuadrado(x, y, (200, 0, 0), ALTO_CUADRADO,
+                                ANCHO_CUADRADO)  # rojo
 
-            else:
-                crea_cuadrado(x, y, (0, 0, 0), ALTO_CUADRADO,
-                              ANCHO_CUADRADO)  # negro
+                else:
+                    crea_cuadrado(x, y, (0, 0, 0), ALTO_CUADRADO,
+                                ANCHO_CUADRADO)  # negro
 
-        reloj.tick(60)  # Fuerza a correr a 60 FPS
+        reloj.tick(15)  # Fuerza a correr a 60 FPS
 
         for event in pygame.event.get():
 
             if event.type == pygame.QUIT:
                 corriendo = False
+
+            #Movimiento player
             elif (event.type == pygame.KEYDOWN):
 
                 if event.key == K_w:
@@ -209,6 +277,65 @@ def main_nivel():
 
                     if posiciones[0][0] + 1 < 20 and matrix[posiciones[0][1]][posiciones[0][0]+1] not in [0, -1]:
                         posiciones[0][0] += 1
+
+                elif event.key == K_r:
+                    return True
+
+        #matar
+        if (posiciones.count(posiciones[indice_infiltrado]) > 1):
+
+            print("matarr")
+            f = posiciones.index(posiciones[indice_infiltrado])
+
+            if (f == indice_infiltrado):
+                f = posiciones.index(posiciones[indice_infiltrado],indice_infiltrado+1)
+
+            muertos[f] = 1
+            print(f"se murio muertos[{f}]")
+
+        #movimiento cpu
+        for i in range(n_personajes-1):
+
+            if (not muertos[i+1]):
+                posiciones = movimiento_cpu(matrix, posiciones, i+1)
+
+        # posiciones = movimiento_cpu(matrix, posiciones, 2)
+        # posiciones = movimiento_cpu(matrix, posiciones, 3)
+
+
+        #chequear monedas
+        for pos in posiciones:
+
+            if (matrix[pos[1]][pos[0]] == -2):
+
+                monedas_obtenidas += 1
+                matrix[pos[1]][pos[0]] = matrix_const[pos[1]][pos[0]]
+                print(monedas_obtenidas)
+
+        if (monedas_obtenidas >= cantidad_monedas):
+            
+            if (indice_infiltrado != 0): print("Felicidades, no quedan monedas")
+
+            else: print("Que mal, obtuvieron todas las monedas")
+
+            return False
+
+        #Chequear muertes
+        if (muertos.count(1) >= n_personajes-1):
+            
+            if (indice_infiltrado != 0): print("Que pena, murieron todos")
+
+            else: print("Felicidades, lograste matarlos a todos!")
+
+            return False
+        
+        if (muertos[0] == 1):
+
+            fuente = pygame.font.SysFont('unispacebold', 20)
+
+            texto = fuente.render(
+                "Que pena, te moriste, puedes ver como terminan tus amigos o reiniciar con r", True, (0, 0, 0))
+            ventana.blit(texto, (100, 100))
 
         pygame.display.flip()
         pygame.display.update()
@@ -276,7 +403,7 @@ def main_menu():
                 if event.key == K_SPACE:
                     reiniciar = True
                     while reiniciar:
-                        main_nivel()
+                        reiniciar = main_nivel()
 
                 elif event.key == K_ESCAPE:
                     corriendo = False
