@@ -193,20 +193,21 @@ def main_nivel():
             elif (event.type == pygame.KEYDOWN):
 
                 if event.key == K_w:
-                    print(matrix[posiciones[0][0]][posiciones[0][1]-1])
-                    if posiciones[0][1] - 1 >= 0 and matrix[posiciones[0][0]][posiciones[0][1]-1] not in [0, -1]:
+                    #print([posiciones[0][0]][posiciones[0][1]-1], matrix[posiciones[0][0]][posiciones[0][1]-1])
+                    if posiciones[0][1] - 1 >= 0 and matrix[posiciones[0][1]-1][posiciones[0][0]] not in [0, -1]:
+                        
                         posiciones[0][1] -= 1
                 elif event.key == K_a:
-                    print(matrix[posiciones[0][0]-1][posiciones[0][1]])
-                    if posiciones[0][0] - 1 >= 0 and matrix[posiciones[0][0]-1][posiciones[0][1]] not in [0, -1]:
+                    #print(matrix[posiciones[0][0]-1][posiciones[0][1]])
+                    if posiciones[0][0] - 1 >= 0 and matrix[posiciones[0][1]][posiciones[0][0]-1] not in [0, -1]:
                         posiciones[0][0] -= 1
                 elif event.key == K_s:
-                    print(matrix[posiciones[0][0]][posiciones[0][1]+1])
-                    if posiciones[0][1] + 1 < 20 and matrix[posiciones[0][0]][posiciones[0][1]+1] not in [0, -1]:
+                    #print(matrix[posiciones[0][0]][posiciones[0][1]+1])
+                    if posiciones[0][1] + 1 < 20 and matrix[posiciones[0][1]+1][posiciones[0][0]] not in [0, -1]:
                         posiciones[0][1] += 1
                 elif event.key == K_d:
 
-                    if posiciones[0][0] + 1 < 20 and matrix[posiciones[0][0]+1][posiciones[0][1]] not in [0, -1]:
+                    if posiciones[0][0] + 1 < 20 and matrix[posiciones[0][1]][posiciones[0][0]+1] not in [0, -1]:
                         posiciones[0][0] += 1
 
         pygame.display.flip()
