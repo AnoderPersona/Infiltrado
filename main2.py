@@ -206,6 +206,7 @@ def main_nivel():
     posiciones = []
     rol_infiltrado = []
     muertos = []
+    rip = False
 
     matrix_nueva = agrega_obstaculos(matrix, cantidad_obstaculos)
     matrix_nueva = agrega_monedas(matrix_nueva, cantidad_monedas)
@@ -279,7 +280,13 @@ def main_nivel():
                         posiciones[0][0] += 1
 
                 elif event.key == K_r:
-                    return True
+
+                    if (rip):
+                        return False, False
+                    else:
+                        return True, False
+
+                    
 
         #matar
         if (posiciones.count(posiciones[indice_infiltrado]) > 1):
@@ -314,24 +321,30 @@ def main_nivel():
 
         if (monedas_obtenidas >= cantidad_monedas):
             
-            if (indice_infiltrado != 0): print("Felicidades, no quedan monedas")
+            if (indice_infiltrado != 0): 
+                print("Felicidades, no quedan monedas")
+                return False, True
 
-            else: print("Que mal, obtuvieron todas las monedas")
-
-            return False
+            else: 
+                print("Que mal, obtuvieron todas las monedas")
+                return False, False
 
         #Chequear muertes
         if (muertos.count(1) >= n_personajes-1):
             
-            if (indice_infiltrado != 0): print("Que pena, murieron todos")
+            if (indice_infiltrado != 0): 
+                print("Que pena, murieron todos")
+                return False, True
 
-            else: print("Felicidades, lograste matarlos a todos!")
-
-            return False
+            else: 
+                print("Felicidades, lograste matarlos a todos!")
+                return False,True
         
         if (muertos[0] == 1):
 
             fuente = pygame.font.SysFont('unispacebold', 20)
+
+            rip = True
 
             texto = fuente.render(
                 "Que pena, te moriste, puedes ver como terminan tus amigos o reiniciar con r", True, (0, 0, 0))
@@ -367,16 +380,57 @@ def pantallaInstrucciones():
             # Controlar jugador1
             elif (event.type == pygame.KEYDOWN):
 
-                if event.key == K_SPACE:  # mueve hacia arriba
+                if event.key == K_SPACE:  
                     main_menu()
 
-                elif event.key == K_ESCAPE:  # mueve hacia arriba
+                elif event.key == K_ESCAPE:  
                     corriendo = False
 
     sys.exit()
 
 # --------------------------------------------------------------------------------------------------------------------
 
+def final(ganador):
+    
+    fuente = pygame.font.SysFont('unispacebold', 32)
+
+    if ganador:
+    #Imprime pantalla victoria
+        ventana.fill((100, 150, 80))  # color de fondo
+        texto = fuente.render(
+        "ganaste, presione espacio para volver al menu", True, (255, 255, 255))
+
+        ventana.blit(texto, (100,100))
+        
+    else:
+    #imprime pantalla derrota
+        ventana.fill((200, 100, 80))  # color de fondo
+        texto = fuente.render(
+        "perdiste, presione espacio para volver al menu", True, (255, 255, 255))
+
+        ventana.blit(texto, (100,100))
+    
+    pygame.display.flip()
+    corriendo = True
+    
+    while corriendo:
+        for event in pygame.event.get():
+            
+                if (event.type == pygame.QUIT):
+                    corriendo = False
+                
+                #Controlar jugador1
+                elif (event.type == pygame.KEYDOWN):
+                    
+                    if event.key == K_r or event.key == K_SPACE: 
+                        main_menu()
+                            
+                            
+                    elif event.key == K_ESCAPE: 
+                        corriendo = False   
+    sys.exit(0)
+
+# --------------------------------------------------------------------------------------------------------------------
 
 def main_menu():
 
@@ -403,7 +457,8 @@ def main_menu():
                 if event.key == K_SPACE:
                     reiniciar = True
                     while reiniciar:
-                        reiniciar = main_nivel()
+                        reiniciar, ganador = main_nivel()
+                    final(ganador)
 
                 elif event.key == K_ESCAPE:
                     corriendo = False
