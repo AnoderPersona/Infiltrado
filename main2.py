@@ -15,33 +15,48 @@ def crea_cuadrado(x: int, y: int, color: tuple, ALTO_CUADRADO: int, ANCHO_CUADRA
     pygame.draw.rect(ventana, color, [x, y, ANCHO_CUADRADO, ALTO_CUADRADO])
 
 
-def despliega_matriz(ALTO_CUADRADO: int, ANCHO_CUADRADO: int, matrix: list):
+def despliega_matriz(ventana, ALTO_CUADRADO: int, ANCHO_CUADRADO: int, matrix: list, matrix_const, coin_img, wall_img):
 
     y = 0  # we start at the top of the screen
-    for row in matrix:
+    for (i, row) in enumerate(matrix):
         x = 0  # for every row we start at the left of the screen again
-        for item in row:
-
+        for (j, item) in enumerate(row):
+            crea_cuadrado(x, y, (200, 200, 20),
+                          ALTO_CUADRADO, ANCHO_CUADRADO)  # verde para fondo monedas
             # pared
             if item == 0:
                 crea_cuadrado(x, y, (255, 255, 255),
                               ALTO_CUADRADO, ANCHO_CUADRADO)  # blanco
+                ventana.blit(wall_img, (x, y))
             # pieza
             elif item == 1:
-                crea_cuadrado(x, y, (200, 100, 60), ALTO_CUADRADO,
+                crea_cuadrado(x, y, (120, 100, 60), ALTO_CUADRADO,
                               ANCHO_CUADRADO)  # naranjo
             # pasillo o ex-moneda
             elif item == 2:
                 crea_cuadrado(x, y, (100, 200, 50), ALTO_CUADRADO,
                               ANCHO_CUADRADO)  # verde
+
+                ventana.blit(floor, (x, y))
             # obstaculo
             elif item == -1:
-                crea_cuadrado(x, y, (200, 50, 100), ALTO_CUADRADO,
-                              ANCHO_CUADRADO)  # rosado oscuro
+                if matrix_const[i][j] == 1:
+                    crea_cuadrado(x, y, (120, 100, 60), ALTO_CUADRADO,
+                                  ANCHO_CUADRADO)
+                elif matrix_const[i][j] == 2:
+                    crea_cuadrado(x, y, (100, 200, 50), ALTO_CUADRADO,
+                                  ANCHO_CUADRADO)  # verde
+                ventana.blit(obstaculo, (x, y))
             # moneda
             elif item == -2:
-                crea_cuadrado(x, y, (200, 200, 20), ALTO_CUADRADO,
-                              ANCHO_CUADRADO)  # verde amarillo
+                if matrix_const[i][j] == 1:
+                    crea_cuadrado(x, y, (120, 100, 60), ALTO_CUADRADO,
+                                  ANCHO_CUADRADO)
+                elif matrix_const[i][j] == 2:
+                    # crea_cuadrado(x, y, (100, 200, 50), ALTO_CUADRADO,
+                    #              ANCHO_CUADRADO)
+                    ventana.blit(floor, (x, y))
+                ventana.blit(coin_img, (x+7, y+7))
 
             x += ANCHO_CUADRADO  # for ever item/number in that row we move one "step" to the right
         y += ALTO_CUADRADO   # for every new row we move one "step" downwards
@@ -96,46 +111,49 @@ def posicion_amigos(mat: list, pos: list):
     print([x, y], mat[y][x])
     return [x, y]
 
+
 def movimiento_cpu(matrix: list, posiciones: list, n: int):
 
-        movio = False
+    movio = False
 
-        while (not movio):
+    while (not movio):
 
-            direccion = random.randint(0, 7)
+        direccion = random.randint(0, 7)
 
-            #arriba
-            if direccion == 0:
-                #print([posiciones[0][0]][posiciones[0][1]-1], matrix[posiciones[0][0]][posiciones[0][1]-1])
-                if posiciones[n][1] - 1 >= 0 and matrix[posiciones[n][1]-1][posiciones[n][0]] not in [0, -1]:
-                    posiciones[n][1] -= 1
-                    movio = True
+        # arriba
+        if direccion == 0:
+            #print([posiciones[0][0]][posiciones[0][1]-1], matrix[posiciones[0][0]][posiciones[0][1]-1])
+            if posiciones[n][1] - 1 >= 0 and matrix[posiciones[n][1]-1][posiciones[n][0]] not in [0, -1]:
+                posiciones[n][1] -= 1
+                movio = True
 
-            elif direccion == 1:
-                #print(matrix[posiciones[n][0]-1][posiciones[n][1]])
-                if posiciones[n][0] - 1 >= 0 and matrix[posiciones[n][1]][posiciones[n][0]-1] not in [0, -1]:
-                    posiciones[n][0] -= 1
-                    movio = True
+        elif direccion == 1:
+            # print(matrix[posiciones[n][0]-1][posiciones[n][1]])
+            if posiciones[n][0] - 1 >= 0 and matrix[posiciones[n][1]][posiciones[n][0]-1] not in [0, -1]:
+                posiciones[n][0] -= 1
+                movio = True
 
-            elif direccion == 2:
-                #print(matrix[posiciones[n][0]][posiciones[n][1]+1])
-                if posiciones[n][1] + 1 < 20 and matrix[posiciones[n][1]+1][posiciones[n][0]] not in [0, -1]:
-                    posiciones[n][1] += 1
-                    movio = True
+        elif direccion == 2:
+            # print(matrix[posiciones[n][0]][posiciones[n][1]+1])
+            if posiciones[n][1] + 1 < 20 and matrix[posiciones[n][1]+1][posiciones[n][0]] not in [0, -1]:
+                posiciones[n][1] += 1
+                movio = True
 
-            elif direccion == 3:
+        elif direccion == 3:
 
-                if posiciones[n][0] + 1 < 20 and matrix[posiciones[n][1]][posiciones[n][0]+1] not in [0, -1]:
-                    posiciones[n][0] += 1
-                    movio = True
-            #quieto
-            if (direccion >= 4): movio = True
-        
-        return posiciones
+            if posiciones[n][0] + 1 < 20 and matrix[posiciones[n][1]][posiciones[n][0]+1] not in [0, -1]:
+                posiciones[n][0] += 1
+                movio = True
+        # quieto
+        if (direccion >= 4):
+            movio = True
+
+    return posiciones
 
 # ================================================================
 #                       Funciones pantallas
 # ================================================================
+
 
 ANCHO_VENTANA = 700
 ALTO_VENTANA = 700
@@ -147,7 +165,14 @@ pygame.init()
 ventana = pygame.display.set_mode((ANCHO_VENTANA, ALTO_VENTANA))
 pygame.display.set_caption("Tutorial")
 ventana.fill((195, 247, 126))  # color de fondo
-pygame.key.set_repeat(500, 50) #Para permitir la repeticion de teclas, primer parametro es cuanto se demora en milisegundos la primera, y el segundo el resto
+# Para permitir la repeticion de teclas, primer parametro es cuanto se demora en milisegundos la primera, y el segundo el resto
+pygame.key.set_repeat(500, 50)
+
+coin = pygame.image.load('./coins.png')
+wall = pygame.image.load('./wall.png')
+floor = pygame.image.load('./azulejos.png')
+obstaculo = pygame.image.load('./obstaculo.png')
+
 
 def main_nivel():
 
@@ -226,30 +251,33 @@ def main_nivel():
     # -------------------------------------------------
 
     pygame.display.flip()
+    ventana.fill((195, 247, 126))  # color de fondo
 
     reloj = pygame.time.Clock()
-    despliega_matriz(ALTO_CUADRADO, ANCHO_CUADRADO, matrix_nueva)
+    despliega_matriz(ventana, ALTO_CUADRADO,
+                     ANCHO_CUADRADO, matrix_nueva, matrix_const, coin, wall)
     corriendo = True
     print(posiciones)
     while corriendo:
-        despliega_matriz(ALTO_CUADRADO, ANCHO_CUADRADO, matrix_nueva)
+        despliega_matriz(ventana, ALTO_CUADRADO,
+                         ANCHO_CUADRADO, matrix_nueva, matrix_const, coin, wall)
 
         # Coloca cpus en el mapa en negro
         for i in range(n_personajes):
-            
+
             if (not muertos[i]):
-            
+
                 x = 0
                 x = posiciones[i][0] * ANCHO_CUADRADO
                 y = posiciones[i][1] * ALTO_CUADRADO
 
                 if (i == indice_infiltrado):
                     crea_cuadrado(x, y, (200, 0, 0), ALTO_CUADRADO,
-                                ANCHO_CUADRADO)  # rojo
+                                  ANCHO_CUADRADO)  # rojo
 
                 else:
                     crea_cuadrado(x, y, (0, 0, 0), ALTO_CUADRADO,
-                                ANCHO_CUADRADO)  # negro
+                                  ANCHO_CUADRADO)  # negro
 
         reloj.tick(15)  # Fuerza a correr a 60 FPS
 
@@ -258,20 +286,20 @@ def main_nivel():
             if event.type == pygame.QUIT:
                 corriendo = False
 
-            #Movimiento player
+            # Movimiento player
             elif (event.type == pygame.KEYDOWN):
 
                 if event.key == K_w:
                     #print([posiciones[0][0]][posiciones[0][1]-1], matrix[posiciones[0][0]][posiciones[0][1]-1])
                     if posiciones[0][1] - 1 >= 0 and matrix[posiciones[0][1]-1][posiciones[0][0]] not in [0, -1]:
-                        
+
                         posiciones[0][1] -= 1
                 elif event.key == K_a:
-                    #print(matrix[posiciones[0][0]-1][posiciones[0][1]])
+                    # print(matrix[posiciones[0][0]-1][posiciones[0][1]])
                     if posiciones[0][0] - 1 >= 0 and matrix[posiciones[0][1]][posiciones[0][0]-1] not in [0, -1]:
                         posiciones[0][0] -= 1
                 elif event.key == K_s:
-                    #print(matrix[posiciones[0][0]][posiciones[0][1]+1])
+                    # print(matrix[posiciones[0][0]][posiciones[0][1]+1])
                     if posiciones[0][1] + 1 < 20 and matrix[posiciones[0][1]+1][posiciones[0][0]] not in [0, -1]:
                         posiciones[0][1] += 1
                 elif event.key == K_d:
@@ -286,21 +314,20 @@ def main_nivel():
                     else:
                         return True, False
 
-                    
-
-        #matar
+        # matar
         if (posiciones.count(posiciones[indice_infiltrado]) > 1):
 
             print("matarr")
             f = posiciones.index(posiciones[indice_infiltrado])
 
             if (f == indice_infiltrado):
-                f = posiciones.index(posiciones[indice_infiltrado],indice_infiltrado+1)
+                f = posiciones.index(
+                    posiciones[indice_infiltrado], indice_infiltrado+1)
 
             muertos[f] = 1
             print(f"se murio muertos[{f}]")
 
-        #movimiento cpu
+        # movimiento cpu
         for i in range(n_personajes-1):
 
             if (not muertos[i+1]):
@@ -309,8 +336,7 @@ def main_nivel():
         # posiciones = movimiento_cpu(matrix, posiciones, 2)
         # posiciones = movimiento_cpu(matrix, posiciones, 3)
 
-
-        #chequear monedas
+        # chequear monedas
         for pos in posiciones:
 
             if (matrix[pos[1]][pos[0]] == -2):
@@ -320,26 +346,26 @@ def main_nivel():
                 print(monedas_obtenidas)
 
         if (monedas_obtenidas >= cantidad_monedas):
-            
-            if (indice_infiltrado != 0): 
+
+            if (indice_infiltrado != 0):
                 print("Felicidades, no quedan monedas")
                 return False, True
 
-            else: 
+            else:
                 print("Que mal, obtuvieron todas las monedas")
                 return False, False
 
-        #Chequear muertes
+        # Chequear muertes
         if (muertos.count(1) >= n_personajes-1):
-            
-            if (indice_infiltrado != 0): 
+
+            if (indice_infiltrado != 0):
                 print("Que pena, murieron todos")
                 return False, True
 
-            else: 
+            else:
                 print("Felicidades, lograste matarlos a todos!")
-                return False,True
-        
+                return False, True
+
         if (muertos[0] == 1):
 
             fuente = pygame.font.SysFont('unispacebold', 20)
@@ -380,57 +406,58 @@ def pantallaInstrucciones():
             # Controlar jugador1
             elif (event.type == pygame.KEYDOWN):
 
-                if event.key == K_SPACE:  
+                if event.key == K_SPACE:
                     main_menu()
 
-                elif event.key == K_ESCAPE:  
+                elif event.key == K_ESCAPE:
                     corriendo = False
 
     sys.exit()
 
 # --------------------------------------------------------------------------------------------------------------------
 
+
 def final(ganador):
-    
+
     fuente = pygame.font.SysFont('unispacebold', 32)
 
     if ganador:
-    #Imprime pantalla victoria
+        # Imprime pantalla victoria
         ventana.fill((100, 150, 80))  # color de fondo
         texto = fuente.render(
-        "ganaste, presione espacio para volver al menu", True, (255, 255, 255))
+            "ganaste, presione espacio para volver al menu", True, (255, 255, 255))
 
-        ventana.blit(texto, (100,100))
-        
+        ventana.blit(texto, (100, 100))
+
     else:
-    #imprime pantalla derrota
+        # imprime pantalla derrota
         ventana.fill((200, 100, 80))  # color de fondo
         texto = fuente.render(
-        "perdiste, presione espacio para volver al menu", True, (255, 255, 255))
+            "perdiste, presione espacio para volver al menu", True, (255, 255, 255))
 
-        ventana.blit(texto, (100,100))
-    
+        ventana.blit(texto, (100, 100))
+
     pygame.display.flip()
     corriendo = True
-    
+
     while corriendo:
         for event in pygame.event.get():
-            
-                if (event.type == pygame.QUIT):
+
+            if (event.type == pygame.QUIT):
+                corriendo = False
+
+            # Controlar jugador1
+            elif (event.type == pygame.KEYDOWN):
+
+                if event.key == K_r or event.key == K_SPACE:
+                    main_menu()
+
+                elif event.key == K_ESCAPE:
                     corriendo = False
-                
-                #Controlar jugador1
-                elif (event.type == pygame.KEYDOWN):
-                    
-                    if event.key == K_r or event.key == K_SPACE: 
-                        main_menu()
-                            
-                            
-                    elif event.key == K_ESCAPE: 
-                        corriendo = False   
     sys.exit(0)
 
 # --------------------------------------------------------------------------------------------------------------------
+
 
 def main_menu():
 
