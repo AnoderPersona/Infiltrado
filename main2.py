@@ -34,10 +34,10 @@ def despliega_matriz(ventana, ALTO_CUADRADO: int, ANCHO_CUADRADO: int, matrix: l
                               ANCHO_CUADRADO)  # naranjo
             # pasillo o ex-moneda
             elif item == 2:
-                crea_cuadrado(x, y, (100, 200, 50), ALTO_CUADRADO,
+                crea_cuadrado(x, y, (120, 100, 60), ALTO_CUADRADO,
                               ANCHO_CUADRADO)  # verde
 
-                ventana.blit(floor, (x, y))
+                #ventana.blit(floor, (x, y))
             # obstaculo
             elif item == -1:
                 if matrix_const[i][j] == 1:
@@ -53,9 +53,9 @@ def despliega_matriz(ventana, ALTO_CUADRADO: int, ANCHO_CUADRADO: int, matrix: l
                     crea_cuadrado(x, y, (120, 100, 60), ALTO_CUADRADO,
                                   ANCHO_CUADRADO)
                 elif matrix_const[i][j] == 2:
-                    # crea_cuadrado(x, y, (100, 200, 50), ALTO_CUADRADO,
-                    #              ANCHO_CUADRADO)
-                    ventana.blit(floor, (x, y))
+                     crea_cuadrado(x, y, (120, 100, 60), ALTO_CUADRADO,
+                                  ANCHO_CUADRADO)
+                    #ventana.blit(floor, (x, y))
                 ventana.blit(coin_img, (x+7, y+7))
 
             x += ANCHO_CUADRADO  # for ever item/number in that row we move one "step" to the right
