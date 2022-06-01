@@ -30,30 +30,30 @@ def despliega_matriz(ventana, ALTO_CUADRADO: int, ANCHO_CUADRADO: int, matrix: l
                 ventana.blit(wall_img, (x, y))
             # pieza
             elif item == 1:
-                crea_cuadrado(x, y, (120, 100, 60), ALTO_CUADRADO,
+                crea_cuadrado(x, y, (167, 190, 219), ALTO_CUADRADO,
                               ANCHO_CUADRADO)  # naranjo
-            # pasillo o ex-moneda
+            # pasillo 
             elif item == 2:
-                crea_cuadrado(x, y, (120, 100, 60), ALTO_CUADRADO,
+                crea_cuadrado(x, y, (167, 190, 219), ALTO_CUADRADO,
                               ANCHO_CUADRADO)  # verde
 
                 #ventana.blit(floor, (x, y))
             # obstaculo
             elif item == -1:
                 if matrix_const[i][j] == 1:
-                    crea_cuadrado(x, y, (120, 100, 60), ALTO_CUADRADO,
+                    crea_cuadrado(x, y, (167, 190, 219), ALTO_CUADRADO,
                                   ANCHO_CUADRADO)
                 elif matrix_const[i][j] == 2:
-                    crea_cuadrado(x, y, (100, 200, 50), ALTO_CUADRADO,
+                    crea_cuadrado(x, y, (167, 190, 219), ALTO_CUADRADO,
                                   ANCHO_CUADRADO)  # verde
                 ventana.blit(obstaculo, (x, y))
             # moneda
             elif item == -2:
                 if matrix_const[i][j] == 1:
-                    crea_cuadrado(x, y, (120, 100, 60), ALTO_CUADRADO,
+                    crea_cuadrado(x, y, (167, 190, 219), ALTO_CUADRADO,
                                   ANCHO_CUADRADO)
                 elif matrix_const[i][j] == 2:
-                     crea_cuadrado(x, y, (120, 100, 60), ALTO_CUADRADO,
+                     crea_cuadrado(x, y, (167, 190, 219), ALTO_CUADRADO,
                                   ANCHO_CUADRADO)
                     #ventana.blit(floor, (x, y))
                 ventana.blit(coin_img, (x+7, y+7))
@@ -168,11 +168,27 @@ ventana.fill((195, 247, 126))  # color de fondo
 # Para permitir la repeticion de teclas, primer parametro es cuanto se demora en milisegundos la primera, y el segundo el resto
 pygame.key.set_repeat(500, 50)
 
+pantalla_inicio = pygame.image.load('./pantalla_inicio.png')
+pantalla_derrota = pygame.image.load('./pantalla_derrota.png')
+pantalla_victoria = pygame.image.load('./pantalla_victoria.png')
+menu_instrucciones = pygame.image.load('./menu_instrucciones.png')
+
+#coin sacado de https://twitter.com/developer_sebby/status/1064553185522696192?lang=hi
 coin = pygame.image.load('./coins.png')
+
+#pared sacada de https://totuslotus.itch.io/free-pixel-art-tiles
 wall = pygame.image.load('./wall.png')
 floor = pygame.image.load('./azulejos.png')
 obstaculo = pygame.image.load('./obstaculo.png')
 
+#mono sacado de https://www.artstation.com/artwork/68QwDV
+mono = pygame.image.load('./astronauta.gif')
+mono_player = pygame.image.load('./astronauta-p.png')
+
+mono_player = pygame.transform.scale(mono_player, (ANCHO_CUADRADO, ALTO_CUADRADO))
+coin = pygame.transform.scale(coin, (ANCHO_CUADRADO, ALTO_CUADRADO))
+wall = pygame.transform.scale(wall, (ANCHO_CUADRADO, ALTO_CUADRADO))
+mono = pygame.transform.scale(mono, (ANCHO_CUADRADO, ALTO_CUADRADO))
 
 def main_nivel():
 
@@ -262,6 +278,13 @@ def main_nivel():
         despliega_matriz(ventana, ALTO_CUADRADO,
                          ANCHO_CUADRADO, matrix_nueva, matrix_const, coin, wall)
 
+        if (indice_infiltrado == 0):
+            fuente = pygame.font.SysFont('unispacebold', 32)
+
+            texto = fuente.render(
+                "Eres la cosa", True, (255, 255, 255))
+            ventana.blit(texto, (100, 10))
+
         # Coloca cpus en el mapa en negro
         for i in range(n_personajes):
 
@@ -271,13 +294,15 @@ def main_nivel():
                 x = posiciones[i][0] * ANCHO_CUADRADO
                 y = posiciones[i][1] * ALTO_CUADRADO
 
-                if (i == indice_infiltrado):
-                    crea_cuadrado(x, y, (200, 0, 0), ALTO_CUADRADO,
-                                  ANCHO_CUADRADO)  # rojo
+                # if (i == indice_infiltrado):
+                #     crea_cuadrado(x, y, (200, 0, 0), ALTO_CUADRADO,
+                #                   ANCHO_CUADRADO)  # rojo
 
-                else:
-                    crea_cuadrado(x, y, (0, 0, 0), ALTO_CUADRADO,
-                                  ANCHO_CUADRADO)  # negro
+                # else:
+                #     crea_cuadrado(x, y, (0, 0, 0), ALTO_CUADRADO,
+                #                   ANCHO_CUADRADO)  # negro
+                if (i == 0): ventana.blit(mono_player, (x, y))
+                else: ventana.blit(mono, (x, y))
 
         reloj.tick(15)  # Fuerza a correr a 60 FPS
 
@@ -388,11 +413,7 @@ def pantallaInstrucciones():
 
     ventana.fill((100, 150, 80))  # color de fondo
 
-    fuente = pygame.font.SysFont('unispacebold', 32)
-
-    vidasTxt = fuente.render(
-        "Aqui van las instrucciones, presione espacio para volver al menu", True, (255, 255, 255))
-    ventana.blit(vidasTxt, (100, 100))
+    ventana.blit(menu_instrucciones,(0,0))
 
     pygame.display.flip()
 
@@ -424,18 +445,14 @@ def final(ganador):
     if ganador:
         # Imprime pantalla victoria
         ventana.fill((100, 150, 80))  # color de fondo
-        texto = fuente.render(
-            "ganaste, presione espacio para volver al menu", True, (255, 255, 255))
+        ventana.blit(pantalla_victoria,(0,0))
 
-        ventana.blit(texto, (100, 100))
 
     else:
         # imprime pantalla derrota
         ventana.fill((200, 100, 80))  # color de fondo
-        texto = fuente.render(
-            "perdiste, presione espacio para volver al menu", True, (255, 255, 255))
+        ventana.blit(pantalla_derrota,(0,0))
 
-        ventana.blit(texto, (100, 100))
 
     pygame.display.flip()
     corriendo = True
@@ -463,11 +480,7 @@ def main_menu():
 
     ventana.fill((195, 150, 200))  # color de fondo
 
-    fuente = pygame.font.SysFont('unispacebold', 32)
-
-    vidasTxt = fuente.render(
-        "menu principal, presione espacio para empezar, i para instrucciones", True, (255, 255, 255))
-    ventana.blit(vidasTxt, (100, 100))
+    ventana.blit((pantalla_inicio),(0,0))
 
     pygame.display.flip()
 
